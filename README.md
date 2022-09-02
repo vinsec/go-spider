@@ -12,6 +12,9 @@ This crawler project is essentially a distributed project with the following spe
 4. support for configuring multiple crawl sources (starting point), support for configuring the output path of crawl results.
 
 
+## Prerequisites
+You need to install Golang locall
+
 ## Getting Started
 ```bash
 # clone repo
@@ -37,9 +40,6 @@ cd bin && ./go-spider
 The default configuration file is conf/spider.conf, and you can change these parameters at will before running
 
 When you see "request queue nil, all sub spiders are idle, Spider exit.", the crawling process will end and the crawling results will be stored in the output directory
-
-### Prerequisites
-You need to install Golang locally
 
 
 ## Contributing
