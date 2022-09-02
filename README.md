@@ -13,7 +13,7 @@ This crawler project is essentially a distributed project with the following spe
 
 
 ## Prerequisites
-You need to install Golang locall
+You'll need to install golang locally first
 
 ## Getting Started
 ```bash
