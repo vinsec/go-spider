@@ -50,6 +50,10 @@ Please read [CONTRIBUTING.md](#) for details on our code of conduct, and the pro
 
 * **vinsec** - *Go-Spider* - [vinsec](https://github.com/vinsec)
 
+## Support
+
+Project development supported by [Jetbrains](https://www.jetbrains.com/community/opensource)
+
 ## License
 
 This project uses [Apache License 2.0](LICENSE.md) 
