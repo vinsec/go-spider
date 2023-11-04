@@ -33,10 +33,10 @@ func (c *Config) Check() (bool, error) {
 		return false, errors.New("OutputDirectory not exist: " + c.Spider.OutputDirectory)
 	}
 	if c.Spider.CrawlInterval < 0 {
-		return false, errors.New("OutputDirectory must greater than zero")
+		return false, errors.New("CrawlInterval must greater than zero")
 	}
 	if c.Spider.CrawlTimeout <= 0 {
-		return false, errors.New("OutputDirectory must greater than zero")
+		return false, errors.New("CrawlTimeout must greater than zero")
 	}
 	if c.Spider.TargetUrl == "" {
 		return false, errors.New("TargetUrl empty")
@@ -54,24 +54,20 @@ func LoadConfigFromFile(filePath string) (*Config, error) {
 		return nil, err
 	}
 
-	var configDir string
-	configDir, err = filepath.Abs(filepath.Dir(filePath))
-	if !util.IsFileExist(conf.Spider.UrlListFile) {
-		urlListFile := configDir + "/" + conf.Spider.UrlListFile
-		if util.IsFileExist(urlListFile) {
-			conf.Spider.UrlListFile = urlListFile
-		}
-	}
-	if !util.IsDirExist(conf.Spider.OutputDirectory) {
-		outputDir := configDir + "/" + conf.Spider.UrlListFile
-		if util.IsDirExist(outputDir) {
-			conf.Spider.OutputDirectory = outputDir
-		}
-	}
-	_, err = conf.Check()
-	if err != nil {
+	configDir := filepath.Dir(filePath)
+	conf.Spider.UrlListFile = resolvePath(configDir, conf.Spider.UrlListFile)
+	conf.Spider.OutputDirectory = resolvePath(configDir, conf.Spider.OutputDirectory)
+
+	if _, err := conf.Check(); err != nil {
 		return nil, err
 	}
-	return &conf, nil
 
+	return &conf, nil
+}
+
+func resolvePath(basePath, targetPath string) string {
+	if filepath.IsAbs(targetPath) {
+		return targetPath
+	}
+	return filepath.Join(basePath, targetPath)
 }

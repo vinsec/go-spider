@@ -12,7 +12,7 @@ func TestManager(t *testing.T) {
 	}
 
 	ok := manager.GetOne()
-	if !ok || manager.Left() != cap -1 {
+	if !ok || manager.Left() != cap-1 {
 		t.Error("test GetOne() failed")
 	}
 
@@ -21,8 +21,8 @@ func TestManager(t *testing.T) {
 		t.Error("test Used() failed")
 	}
 
-	manager.Freeone()
+	manager.FreeOne()
 	if manager.Left() != cap {
-		t.Error("test Freeone() failed")
+		t.Error("test FreeOne() failed")
 	}
 }

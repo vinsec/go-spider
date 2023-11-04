@@ -33,7 +33,7 @@ func (r *RoutineManager) GetOne() bool {
 }
 
 // release a sub spider co-routine
-func (r *RoutineManager) Freeone() {
+func (r *RoutineManager) FreeOne() {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 
