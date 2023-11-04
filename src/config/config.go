@@ -33,10 +33,10 @@ func (c *Config) Check() (bool, error) {
 		return false, errors.New("OutputDirectory not exist: " + c.Spider.OutputDirectory)
 	}
 	if c.Spider.CrawlInterval < 0 {
-		return false, errors.New("OutputDirectory must greater than zero")
+		return false, errors.New("CrawlInterval must greater than zero")
 	}
 	if c.Spider.CrawlTimeout <= 0 {
-		return false, errors.New("OutputDirectory must greater than zero")
+		return false, errors.New("CrawlTimeout must greater than zero")
 	}
 	if c.Spider.TargetUrl == "" {
 		return false, errors.New("TargetUrl empty")

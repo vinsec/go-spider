@@ -110,7 +110,7 @@ func (s *Spider) Start() {
 		}
 
 		go func() {
-			defer s.spiderManager.Freeone()
+			defer s.spiderManager.FreeOne()
 
 			for {
 				req, err := s.taskQueue.Pop()
