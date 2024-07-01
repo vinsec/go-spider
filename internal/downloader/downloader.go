@@ -1,6 +1,8 @@
 package downloader
 
 import (
+	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -15,9 +17,9 @@ import (
 	"github.com/vinsec/go-spider/util"
 )
 
-//https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/MIME_types
-//if page's content-type contained in the map,then skipped(don't parse it)
-//using map[string]interface{} to get better performance(because the value is useless)
+// https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+// if page's content-type contained in the map,then skipped(don't parse it)
+// using map[string]interface{} to get better performance(because the value is useless)
 var skippedContentType = map[string]interface{}{
 	"video": nil,
 	"audio": nil,
@@ -77,20 +79,19 @@ func (d *Downloader) Download(req *request.Request) (*response.Response, error) 
 	}
 	defer resp.Body.Close()
 
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
+	// Check the response status code before reading the body
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	//apply resp's attributions to page
+	// Create the response object early so we can return it in case of error
 	page := response.NewResp(req)
 	page.SetRespHeader(resp.Header)
-	page.SetRespBody(content)
 	page.SetRespStatus(resp.StatusCode)
 	page.SetRespCookies(resp.Cookies())
 
-	//don't parse page when it's content-type is contained in the map
-	contentType := http.DetectContentType(content)
+	// Don't parse page when its content-type is contained in the map
+	contentType := resp.Header.Get("Content-Type")
 	realType := strings.ToLower(contentType[:5])
 	if _, exist := skippedContentType[realType]; exist {
 		page.SetIsParse(false)
@@ -98,7 +99,7 @@ func (d *Downloader) Download(req *request.Request) (*response.Response, error) 
 		page.SetIsParse(true)
 	}
 
-	if req.IsDownload() && page.Success() {
+	if req.IsDownload() {
 		fileSave := url.QueryEscape(req.Url())
 		res, err := os.Create(d.resDir + "/" + fileSave)
 		if err != nil {
@@ -106,11 +107,20 @@ func (d *Downloader) Download(req *request.Request) (*response.Response, error) 
 			return page, nil
 		}
 		defer res.Close()
-		_, err = res.Write(content)
+
+		// Copy the response body directly to the file
+		_, err = io.Copy(res, resp.Body)
 		if err != nil {
 			util.Logger.Warn("[warn] downloader save resp to file failed ", err)
 		}
+	} else {
+		// Only read the response body into memory if necessary
+		content, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		page.SetRespBody(content)
 	}
-	return page, nil
 
+	return page, nil
 }
