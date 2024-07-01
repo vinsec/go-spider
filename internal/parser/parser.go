@@ -38,13 +38,15 @@ func (p *Parser) Parse(resp *response.Response) error {
 	//read bodyString to a new reader
 	bodyReader := strings.NewReader(bodyString)
 
-	//trans the charset of the reader to UTF-8
-	strUTFBody, err := util.TransCharsetUTF8(resp.RespHeader("Content-Type"), bodyReader)
-	if err == nil {
-		bodyReader = strings.NewReader(strUTFBody)
+	//trans the charset of the reader to UTF-8 only if necessary
+	contentType := resp.RespHeader("Content-Type")
+	if !strings.Contains(strings.ToLower(contentType), "utf-8") {
+		strUTFBody, err := util.TransCharsetUTF8(contentType, bodyReader)
+		if err == nil {
+			bodyReader = strings.NewReader(strUTFBody)
+		}
 	}
 
-	//
 	root, err := html.Parse(bodyReader)
 	if err != nil {
 		return err
@@ -54,7 +56,7 @@ func (p *Parser) Parse(resp *response.Response) error {
 }
 
 func (p *Parser) ParseByNode(resp *response.Response, n *html.Node) {
-	if n.Type == html.ElementNode {
+	if n.Type == html.ElementNode && (n.Data == "a" || n.Data == "link" || n.Data == "img" || n.Data == "script" || n.Data == "iframe") {
 		//range all the node's Attr, to find all the links
 		for _, arr := range n.Attr {
 			if arr.Key == "href" || arr.Key == "src" {
