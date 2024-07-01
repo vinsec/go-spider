@@ -46,7 +46,7 @@ func NewSpider(concurrency int, maxDepth int, interval int) *Spider {
 
 func (s *Spider) AppendOrigins(urls map[string]bool) {
 	for url, isDownload := range urls {
-		req := request.NewRequest("GET", url, isDownload, util.SEED_START_DEPTH, nil)
+		req, _ := request.NewRequest("GET", url, isDownload, util.SEED_START_DEPTH, nil)
 		if req != nil {
 			s.addStartReq(req)
 		}

@@ -70,7 +70,7 @@ func (p *Parser) ParseByNode(resp *response.Response, n *html.Node) {
 					continue
 				}
 
-				req := request.NewRequest("GET", absUrl, false, resp.Depth()+1, nil)
+				req, _ := request.NewRequest("GET", absUrl, false, resp.Depth()+1, nil)
 				req.Header.Add("Referer", resp.Url())
 				//in this spider, we only download file with suffix *.html|*.htm
 				if p.target.MatchString(absUrl) {
