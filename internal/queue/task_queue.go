@@ -3,7 +3,6 @@ package queue
 import (
 	"container/list"
 	"crypto/md5"
-	"errors"
 	"sync"
 )
 import (
@@ -36,8 +35,10 @@ func (t *TaskQueue) Push(req *request.Request) {
 		return
 	}
 	key := md5.Sum(url)
-	if _, ok := t.hashTable[key]; ok {
-		return
+	if t.taskQueue.Len() > 1000 {
+		if _, ok := t.hashTable[key]; ok {
+			return
+		}
 	}
 
 	t.taskQueue.PushBack(req)
@@ -54,11 +55,8 @@ func (t *TaskQueue) Pop() (*request.Request, error) {
 	e := t.taskQueue.Front()
 	t.taskQueue.Remove(e)
 
-	req, ok := e.Value.(*request.Request)
-	if ok {
-		return req, nil
-	}
-	return nil, errors.New("poped element not the type of *request.Request")
+	req := e.Value.(*request.Request)
+	return req, nil
 }
 
 func (t *TaskQueue) Count() int {
