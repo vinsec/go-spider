@@ -1,23 +1,25 @@
 package util
 
 import (
+	"errors"
 	"fmt"
-	"os"
 )
 
 const helpMenu = `
 Usage:	mSpider:	./mSpider [options]
 
 Options:
-	-c="../conf/spider.conf"	:	set spider config file
-	-l="../log/"				:	set log directory
-	-v							: 	display spider version then exit
+ -c="../conf/spider.conf" : set spider config file
+ -l="../log/"             : set log directory
+ -v                       : display spider version then exit
 
 Example:
-	./mSpider -c ../conf/spider.conf -l ../log/
+ ./mSpider -c ../conf/spider.conf -l ../log/
 `
 
-func DisplayHelpMenu(){
-	fmt.Print(helpMenu+"\n")
-	os.Exit(0)
+var ErrHelpMenu = errors.New("help menu displayed")
+
+func DisplayHelpMenu() error {
+	fmt.Print(helpMenu + "\n")
+	return ErrHelpMenu
 }
