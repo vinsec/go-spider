@@ -3,7 +3,8 @@ package util
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"os"
+	"sync"
 )
 
 // depth of start seed
@@ -18,20 +19,31 @@ func GetSeedFromFile(path string, isDownload bool) (map[string]bool, error) {
 	if !IsFileExist(path) {
 		return nil, errors.New("file not exist")
 	}
-	data, err := ioutil.ReadFile(path)
+
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
 
 	var decode seedData
-	err = json.Unmarshal(data, &decode)
+	err = decoder.Decode(&decode)
 	if err != nil {
 		return nil, err
 	}
 
-	result := map[string]bool{}
+	result := make(map[string]bool)
+	var wg sync.WaitGroup
 	for _, url := range decode {
-		result[url] = isDownload
+		wg.Add(1)
+		go func(url string) {
+			defer wg.Done()
+			result[url] = isDownload
+		}(url)
 	}
+	wg.Wait()
+
 	return result, nil
 }

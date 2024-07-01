@@ -1,7 +1,6 @@
 package util
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -17,9 +16,6 @@ Example:
  ./mSpider -c ../conf/spider.conf -l ../log/
 `
 
-var ErrHelpMenu = errors.New("help menu displayed")
-
-func DisplayHelpMenu() error {
+func DisplayHelpMenu() {
 	fmt.Print(helpMenu + "\n")
-	return ErrHelpMenu
 }
