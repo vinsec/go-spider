@@ -49,6 +49,7 @@ func (c *Config) Check() (bool, error) {
 	return true, nil
 }
 
+// LoadConfigFromFile loads config file fome local file
 func LoadConfigFromFile(filePath string) (*Config, error) {
 	var conf Config
 	err := gcfg.ReadFileInto(&conf, filePath)
