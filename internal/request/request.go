@@ -1,13 +1,14 @@
 package request
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
 )
 
-//	isDownload depend if the page need to be downloaded
+// isDownload depend if the page need to be downloaded
 type Request struct {
 	*http.Request
 	retryTimes int
@@ -15,20 +16,20 @@ type Request struct {
 	depth      int
 }
 
-func NewRequest(method string, url string, isDownload bool, depth int, data url.Values) *Request {
-	if url == "" {
-		return nil
+func NewRequest(method string, urlStr string, isDownload bool, depth int, data url.Values) (*Request, error) {
+	if urlStr == "" {
+		return nil, errors.New("url cannot be empty")
 	}
-	req, err := http.NewRequest(method, url, strings.NewReader(data.Encode()))
+	req, err := http.NewRequest(method, urlStr, strings.NewReader(data.Encode()))
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	return &Request{
 		Request:    req,
 		retryTimes: 0,
 		isDownload: isDownload,
 		depth:      depth,
-	}
+	}, nil
 }
 
 func (r *Request) IsDownload() bool {
@@ -56,7 +57,7 @@ func (r *Request) SetIsDownload(isdownload bool) {
 }
 
 func (r *Request) Valid() bool {
-	if r.Url() == "" {
+	if r.Url() == "" || r.Request.Method == "" {
 		return false
 	}
 	return true
